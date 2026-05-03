@@ -48,6 +48,7 @@ class ConverterHandler(BaseHTTPRequestHandler):
                 bridge_side=str(payload.get("bridgeSide") or "top"),
                 simplify=parse_float(payload.get("simplify"), 0.75),
                 simplify_mm=parse_optional_nonnegative_float(payload.get("simplifyMm")),
+                backend=str(payload.get("backend") or "native"),
                 min_area_px=parse_int(payload.get("minAreaPx"), 0),
                 layer=str(payload.get("layer") or "CUT")[:64],
                 color=parse_int(payload.get("color"), 1),
@@ -67,6 +68,7 @@ class ConverterHandler(BaseHTTPRequestHandler):
                 "bridgesCreated": result.bridges_created,
                 "simplifyTolerancePx": result.simplify_tolerance_px,
                 "simplifyToleranceMm": result.simplify_tolerance_mm,
+                "backend": result.backend,
                 "pathCount": result.path_count,
                 "nodeCount": result.node_count,
                 "previewPng": "data:image/png;base64,"

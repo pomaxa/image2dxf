@@ -36,6 +36,12 @@ python3 -m pip install -e .
 img2dxf-web
 ```
 
+OpenCV tracing is optional. Install it when you want to compare the faster contour backend:
+
+```sh
+python3 -m pip install -e ".[opencv]"
+```
+
 Open the local UI:
 
 ```text
@@ -68,6 +74,12 @@ Reduce excess polygon nodes in physical units:
 img2dxf input.png output.dxf --width-mm 100 --simplify-mm 0.2
 ```
 
+Use OpenCV contour tracing:
+
+```sh
+img2dxf input.png output.dxf --width-mm 100 --backend opencv
+```
+
 ## Key Options
 
 ```text
@@ -77,6 +89,7 @@ img2dxf input.png output.dxf --width-mm 100 --simplify-mm 0.2
 --invert                 Trace light regions instead of dark regions
 --bridge-mm 2            Add bridges to inner black islands
 --bridge-side top        top, bottom, left, right, or nearest
+--backend native         native or opencv contour tracing
 --simplify-mm 0.2        Simplify contours in millimeters
 --simplify 0.8           Simplify contours in source pixels
 --min-area-px 20         Remove tiny black components before tracing
@@ -105,7 +118,7 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests
 Run coverage locally after installing development dependencies:
 
 ```sh
-python3 -m pip install -e ".[dev]"
+python3 -m pip install -e ".[dev,opencv]"
 PYTHONDONTWRITEBYTECODE=1 coverage run -m unittest discover -s tests
 coverage report
 ```

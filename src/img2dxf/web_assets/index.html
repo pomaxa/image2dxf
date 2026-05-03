@@ -359,6 +359,13 @@
       <section class="group">
         <div class="group-title">DXF</div>
         <label>
+          Режим трассировки
+          <select id="backend">
+            <option value="native" selected>Native</option>
+            <option value="opencv">OpenCV</option>
+          </select>
+        </label>
+        <label>
           Ширина детали, мм
           <input id="widthMm" type="number" min="1" step="0.1" value="100">
         </label>
@@ -403,6 +410,7 @@
           <div class="metric">Контуры: <b id="pathsMetric">0</b></div>
           <div class="metric">Точки: <b id="nodesMetric">0</b></div>
           <div class="metric">Перемычки: <b id="bridgesMetric">0</b></div>
+          <div class="metric">Режим: <b id="backendMetric">native</b></div>
           <div class="metric">Упрощение: <b id="simplifyMetric">-</b></div>
           <div class="metric">Порог: <b id="thresholdMetric">-</b></div>
           <div class="metric">Масштаб: <b id="scaleMetric">-</b></div>
@@ -443,6 +451,7 @@
       thresholdReadout: document.getElementById("thresholdReadout"),
       invert: document.getElementById("invert"),
       minAreaPx: document.getElementById("minAreaPx"),
+      backend: document.getElementById("backend"),
       widthMm: document.getElementById("widthMm"),
       bridgeMm: document.getElementById("bridgeMm"),
       bridgeSide: document.getElementById("bridgeSide"),
@@ -459,6 +468,7 @@
       pathsMetric: document.getElementById("pathsMetric"),
       nodesMetric: document.getElementById("nodesMetric"),
       bridgesMetric: document.getElementById("bridgesMetric"),
+      backendMetric: document.getElementById("backendMetric"),
       simplifyMetric: document.getElementById("simplifyMetric"),
       thresholdMetric: document.getElementById("thresholdMetric"),
       scaleMetric: document.getElementById("scaleMetric")
@@ -513,6 +523,7 @@
             threshold: Number(el.threshold.value),
             invert: el.invert.checked,
             minAreaPx: Number(el.minAreaPx.value || 0),
+            backend: el.backend.value,
             widthMm: el.widthMm.value,
             bridgeMm: el.bridgeMm.value,
             bridgeSide: el.bridgeSide.value,
@@ -545,6 +556,7 @@
       el.pathsMetric.textContent = result.pathCount;
       el.nodesMetric.textContent = result.nodeCount;
       el.bridgesMetric.textContent = `${result.bridgesCreated} / ${result.bridgeWidthPx}px`;
+      el.backendMetric.textContent = result.backend;
       el.simplifyMetric.textContent = `${result.simplifyToleranceMm.toFixed(2)} мм`;
       el.thresholdMetric.textContent = result.threshold;
       el.scaleMetric.textContent = `${result.scaleMmPerPixel.toFixed(4)} мм/px`;
@@ -592,6 +604,7 @@
       el.threshold,
       el.invert,
       el.minAreaPx,
+      el.backend,
       el.widthMm,
       el.bridgeMm,
       el.bridgeSide,

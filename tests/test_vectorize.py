@@ -1,4 +1,5 @@
 import unittest
+from importlib.util import find_spec
 from io import BytesIO
 
 from PIL import Image, ImageDraw
@@ -11,10 +12,21 @@ from img2dxf.bridges import (
 from img2dxf.convert import (
     ConversionOptions,
     convert_image,
+    normalize_backend,
     resolve_simplify_tolerance_px,
 )
 from img2dxf.dxf import dxf_text
 from img2dxf.vectorize import to_mm_polylines, trace_mask
+
+
+def _sample_rectangle_png() -> BytesIO:
+    image = Image.new("RGB", (8, 6), "white")
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((2, 1, 5, 4), fill="black")
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    buffer.seek(0)
+    return buffer
 
 
 class TraceMaskTests(unittest.TestCase):
@@ -110,6 +122,32 @@ class ConvertImageTests(unittest.TestCase):
         )
 
         self.assertAlmostEqual(tolerance, 2.5)
+
+    def test_native_backend_is_default(self):
+        result = convert_image(
+            _sample_rectangle_png(),
+            ConversionOptions(threshold=128, simplify=0),
+        )
+
+        self.assertEqual(result.backend, "native")
+        self.assertEqual(result.path_count, 1)
+
+    @unittest.skipUnless(find_spec("cv2"), "OpenCV is not installed")
+    def test_opencv_backend_traces_contours_when_available(self):
+        result = convert_image(
+            _sample_rectangle_png(),
+            ConversionOptions(threshold=128, simplify=0.75, backend="opencv"),
+        )
+
+        self.assertEqual(result.backend, "opencv")
+        self.assertEqual(result.path_count, 1)
+        self.assertGreaterEqual(result.node_count, 3)
+
+    def test_backend_validation_rejects_unknown_mode(self):
+        self.assertEqual(normalize_backend(" OpenCV "), "opencv")
+
+        with self.assertRaises(ValueError):
+            normalize_backend("potrace")
 
 
 class DxfTests(unittest.TestCase):

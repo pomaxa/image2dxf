@@ -19,7 +19,9 @@ Use Python 3.10+ and install the package in editable mode before local developme
 
 ```sh
 python3 -m pip install -e .  # Install the img2dxf CLI locally
+python3 -m pip install -e ".[opencv]"  # Optional OpenCV backend
 img2dxf input.png output.dxf --width-mm 100 --mono-output preview.png
+img2dxf input.png output.dxf --width-mm 100 --backend opencv
 img2dxf input.png output.dxf --width-mm 100 --bridge-mm 2 --bridge-side top
 PYTHONPATH=src python3 -m img2dxf.web --host 127.0.0.1 --port 8000
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests

@@ -22,6 +22,7 @@ def main(argv: list[str] | None = None) -> int:
                 bridge_side=args.bridge_side,
                 simplify=args.simplify,
                 simplify_mm=args.simplify_mm,
+                backend=args.backend,
                 min_area_px=args.min_area_px,
                 layer=args.layer,
                 color=args.color,
@@ -40,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
 
     print(
         f"threshold={result.threshold} paths={result.path_count} "
+        f"backend={result.backend} "
         f"bridges={result.bridges_created} "
         f"simplify={result.simplify_tolerance_mm:.3f}mm "
         f"scale={result.scale_mm_per_pixel:.6f}mm/px output={args.output}"
@@ -87,6 +89,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--simplify-mm",
         type=float,
         help="Polyline simplification tolerance in millimeters. Overrides --simplify.",
+    )
+    parser.add_argument(
+        "--backend",
+        choices=("native", "opencv"),
+        default="native",
+        help="Contour tracing backend. OpenCV is faster but requires the opencv extra.",
     )
     parser.add_argument(
         "--bridge-mm",

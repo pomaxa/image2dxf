@@ -22,6 +22,7 @@ class ConversionOptions:
     bridge_side: str = "top"
     simplify: float = 0.75
     simplify_mm: float | None = None
+    backend: str = "native"
     min_area_px: int = 0
     layer: str = "CUT"
     color: int = 1
@@ -37,6 +38,7 @@ class ConversionResult:
     bridges_created: int
     simplify_tolerance_px: float
     simplify_tolerance_mm: float
+    backend: str
     paths: list[Polyline]
     dxf: str
     preview_png: bytes
@@ -86,7 +88,8 @@ def convert_image(
         simplify_px=options.simplify,
         simplify_mm=options.simplify_mm,
     )
-    paths = trace_mask(mask, simplify=simplify_tolerance_px)
+    backend = normalize_backend(options.backend)
+    paths = trace_paths(mask, simplify=simplify_tolerance_px, backend=backend)
     polylines = to_mm_polylines(
         paths,
         image_height_px=height,
@@ -106,6 +109,7 @@ def convert_image(
         bridges_created=bridges_created,
         simplify_tolerance_px=simplify_tolerance_px,
         simplify_tolerance_mm=simplify_tolerance_px * scale,
+        backend=backend,
         paths=paths,
         dxf=dxf_text(polylines, layer=options.layer, color=options.color),
         preview_png=preview_buffer.getvalue(),
@@ -147,6 +151,28 @@ def resolve_simplify_tolerance_px(
     if simplify_mm < 0:
         raise ValueError("simplify_mm must be 0 or greater.")
     return simplify_mm / scale_mm_per_pixel
+
+
+def normalize_backend(backend: str) -> str:
+    normalized = backend.strip().lower()
+    if normalized not in {"native", "opencv"}:
+        raise ValueError("backend must be native or opencv")
+    return normalized
+
+
+def trace_paths(
+    mask: list[list[bool]],
+    *,
+    simplify: float,
+    backend: str,
+) -> list[Polyline]:
+    if backend == "native":
+        return trace_mask(mask, simplify=simplify)
+    if backend == "opencv":
+        from .opencv_vectorize import trace_mask_opencv
+
+        return trace_mask_opencv(mask, simplify=simplify)
+    raise ValueError("backend must be native or opencv")
 
 
 def svg_preview(paths: list[Polyline], *, width: int, height: int) -> str:
