@@ -7,3 +7,6 @@ dist/
 *.dxf
 *_mono.png
 preview.png
+.coverage
+coverage.xml
+htmlcov/

@@ -5,6 +5,7 @@
 </p>
 
 [![Tests](https://github.com/pomaxa/image2dxf/actions/workflows/tests.yml/badge.svg)](https://github.com/pomaxa/image2dxf/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/coverage-80%25_minimum-brightgreen)](.github/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/github/license/pomaxa/image2dxf)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![Version](https://img.shields.io/badge/version-0.1.0-2f6f4e)](pyproject.toml)
@@ -99,6 +100,14 @@ Run tests:
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests
+```
+
+Run coverage locally after installing development dependencies:
+
+```sh
+python3 -m pip install -e ".[dev]"
+PYTHONDONTWRITEBYTECODE=1 coverage run -m unittest discover -s tests
+coverage report
 ```
 
 Project layout:

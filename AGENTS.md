@@ -23,6 +23,7 @@ img2dxf input.png output.dxf --width-mm 100 --mono-output preview.png
 img2dxf input.png output.dxf --width-mm 100 --bridge-mm 2 --bridge-side top
 PYTHONPATH=src python3 -m img2dxf.web --host 127.0.0.1 --port 8000
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests
+PYTHONDONTWRITEBYTECODE=1 coverage run -m unittest discover -s tests && coverage report
 ```
 
 The CLI converts raster artwork to a monochrome mask, traces black regions, and writes DXF polylines in millimeters.
@@ -33,7 +34,7 @@ Use 4-space indentation for Python and descriptive snake_case names for modules,
 
 ## Testing Guidelines
 
-Place tests in `tests/` and mirror the source layout where practical. Prefer deterministic tests that do not require connected laser hardware. Name tests after behavior, for example `test_single_black_pixel_becomes_square`.
+Place tests in `tests/` and mirror the source layout where practical. Prefer deterministic tests that do not require connected laser hardware. Name tests after behavior, for example `test_single_black_pixel_becomes_square`. CI enforces at least 80% coverage through `coverage.py`.
 
 ## Commit & Pull Request Guidelines
 

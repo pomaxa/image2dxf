@@ -10,6 +10,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["Pillow>=10"]
 
+[project.optional-dependencies]
+dev = ["coverage[toml]>=7"]
+
 [project.scripts]
 img2dxf = "img2dxf.cli:main"
 img2dxf-web = "img2dxf.web:main"
@@ -19,3 +22,16 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 img2dxf = ["web_assets/*"]
+
+[tool.coverage.run]
+branch = true
+source = ["img2dxf"]
+omit = ["src/img2dxf/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = true
+exclude_lines = [
+    "if __name__ == .__main__.:",
+]
