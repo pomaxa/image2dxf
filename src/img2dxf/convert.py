@@ -21,6 +21,7 @@ class ConversionOptions:
     bridge_mm: float = 0.0
     bridge_side: str = "top"
     simplify: float = 0.75
+    simplify_mm: float | None = None
     min_area_px: int = 0
     layer: str = "CUT"
     color: int = 1
@@ -34,6 +35,8 @@ class ConversionResult:
     scale_mm_per_pixel: float
     bridge_width_px: int
     bridges_created: int
+    simplify_tolerance_px: float
+    simplify_tolerance_mm: float
     paths: list[Polyline]
     dxf: str
     preview_png: bytes
@@ -78,7 +81,12 @@ def convert_image(
     else:
         bridges_created = 0
 
-    paths = trace_mask(mask, simplify=options.simplify)
+    simplify_tolerance_px = resolve_simplify_tolerance_px(
+        scale_mm_per_pixel=scale,
+        simplify_px=options.simplify,
+        simplify_mm=options.simplify_mm,
+    )
+    paths = trace_mask(mask, simplify=simplify_tolerance_px)
     polylines = to_mm_polylines(
         paths,
         image_height_px=height,
@@ -96,6 +104,8 @@ def convert_image(
         scale_mm_per_pixel=scale,
         bridge_width_px=bridge_width_px,
         bridges_created=bridges_created,
+        simplify_tolerance_px=simplify_tolerance_px,
+        simplify_tolerance_mm=simplify_tolerance_px * scale,
         paths=paths,
         dxf=dxf_text(polylines, layer=options.layer, color=options.color),
         preview_png=preview_buffer.getvalue(),
@@ -120,6 +130,23 @@ def resolve_scale(
             raise ValueError("scale_mm_per_pixel must be greater than 0.")
         return scale_mm_per_pixel
     return 1.0
+
+
+def resolve_simplify_tolerance_px(
+    *,
+    scale_mm_per_pixel: float,
+    simplify_px: float,
+    simplify_mm: float | None = None,
+) -> float:
+    if scale_mm_per_pixel <= 0:
+        raise ValueError("scale_mm_per_pixel must be greater than 0.")
+    if simplify_px < 0:
+        raise ValueError("simplify must be 0 or greater.")
+    if simplify_mm is None:
+        return simplify_px
+    if simplify_mm < 0:
+        raise ValueError("simplify_mm must be 0 or greater.")
+    return simplify_mm / scale_mm_per_pixel
 
 
 def svg_preview(paths: list[Polyline], *, width: int, height: int) -> str:

@@ -40,6 +40,12 @@ For stencil-style artwork where inner letter parts must stay attached, add bridg
 img2dxf input.png output.dxf --width-mm 100 --bridge-mm 2
 ```
 
+For smoother DXF output, simplify polygons in millimeters:
+
+```sh
+img2dxf input.png output.dxf --width-mm 100 --simplify-mm 0.2
+```
+
 Run the local preview UI:
 
 ```sh
@@ -55,6 +61,7 @@ Useful options:
 --bridge-mm 2            Add bridges to inner black islands, such as O/e counters
 --bridge-side top        Put bridges on top, bottom, left, right, or nearest side
 --simplify 0.8           Reduce DXF nodes; value is in source pixels
+--simplify-mm 0.2        Reduce DXF nodes; value is in millimeters
 --min-area-px 20         Remove tiny black components before tracing
 --layer CUT              Set the DXF layer name
 ```

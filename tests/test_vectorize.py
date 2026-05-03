@@ -8,7 +8,11 @@ from img2dxf.bridges import (
     bridge_width_to_px,
     label_black_components,
 )
-from img2dxf.convert import ConversionOptions, convert_image
+from img2dxf.convert import (
+    ConversionOptions,
+    convert_image,
+    resolve_simplify_tolerance_px,
+)
 from img2dxf.dxf import dxf_text
 from img2dxf.vectorize import to_mm_polylines, trace_mask
 
@@ -81,6 +85,31 @@ class ConvertImageTests(unittest.TestCase):
 
         self.assertEqual(result.bridges_created, 1)
         self.assertEqual(result.bridge_width_px, 1)
+
+    def test_convert_image_accepts_simplify_in_mm(self):
+        image = Image.new("RGB", (8, 6), "white")
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((2, 1, 5, 4), fill="black")
+        buffer = BytesIO()
+        image.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        result = convert_image(
+            buffer,
+            ConversionOptions(threshold=128, width_mm=16, simplify_mm=0.5),
+        )
+
+        self.assertAlmostEqual(result.simplify_tolerance_px, 0.25)
+        self.assertAlmostEqual(result.simplify_tolerance_mm, 0.5)
+
+    def test_simplify_mm_overrides_pixel_tolerance(self):
+        tolerance = resolve_simplify_tolerance_px(
+            scale_mm_per_pixel=0.2,
+            simplify_px=9,
+            simplify_mm=0.5,
+        )
+
+        self.assertAlmostEqual(tolerance, 2.5)
 
 
 class DxfTests(unittest.TestCase):

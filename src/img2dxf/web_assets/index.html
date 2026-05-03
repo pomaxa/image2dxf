@@ -377,11 +377,11 @@
           </select>
         </label>
         <label>
-          Упрощение контура, px
-          <input id="simplify" type="range" min="0" max="3" step="0.1" value="0.8">
+          Упрощение полигонов, мм
+          <input id="simplifyMm" type="range" min="0" max="2" step="0.05" value="0.2">
         </label>
         <div class="row">
-          <span class="value" id="simplifyReadout">0.8 px</span>
+          <span class="value" id="simplifyReadout">0.20 мм</span>
         </div>
         <label>
           Слой
@@ -403,6 +403,7 @@
           <div class="metric">Контуры: <b id="pathsMetric">0</b></div>
           <div class="metric">Точки: <b id="nodesMetric">0</b></div>
           <div class="metric">Перемычки: <b id="bridgesMetric">0</b></div>
+          <div class="metric">Упрощение: <b id="simplifyMetric">-</b></div>
           <div class="metric">Порог: <b id="thresholdMetric">-</b></div>
           <div class="metric">Масштаб: <b id="scaleMetric">-</b></div>
         </div>
@@ -445,7 +446,7 @@
       widthMm: document.getElementById("widthMm"),
       bridgeMm: document.getElementById("bridgeMm"),
       bridgeSide: document.getElementById("bridgeSide"),
-      simplify: document.getElementById("simplify"),
+      simplifyMm: document.getElementById("simplifyMm"),
       simplifyReadout: document.getElementById("simplifyReadout"),
       layer: document.getElementById("layer"),
       convertBtn: document.getElementById("convertBtn"),
@@ -458,6 +459,7 @@
       pathsMetric: document.getElementById("pathsMetric"),
       nodesMetric: document.getElementById("nodesMetric"),
       bridgesMetric: document.getElementById("bridgesMetric"),
+      simplifyMetric: document.getElementById("simplifyMetric"),
       thresholdMetric: document.getElementById("thresholdMetric"),
       scaleMetric: document.getElementById("scaleMetric")
     };
@@ -469,7 +471,7 @@
     function updateControlReadouts() {
       el.threshold.disabled = el.autoThreshold.checked;
       el.thresholdReadout.textContent = el.autoThreshold.checked ? "auto" : el.threshold.value;
-      el.simplifyReadout.textContent = `${Number(el.simplify.value).toFixed(1)} px`;
+      el.simplifyReadout.textContent = `${Number(el.simplifyMm.value).toFixed(2)} мм`;
     }
 
     function debounceConvert() {
@@ -514,7 +516,7 @@
             widthMm: el.widthMm.value,
             bridgeMm: el.bridgeMm.value,
             bridgeSide: el.bridgeSide.value,
-            simplify: Number(el.simplify.value),
+            simplifyMm: el.simplifyMm.value,
             layer: el.layer.value || "CUT"
           })
         });
@@ -543,6 +545,7 @@
       el.pathsMetric.textContent = result.pathCount;
       el.nodesMetric.textContent = result.nodeCount;
       el.bridgesMetric.textContent = `${result.bridgesCreated} / ${result.bridgeWidthPx}px`;
+      el.simplifyMetric.textContent = `${result.simplifyToleranceMm.toFixed(2)} мм`;
       el.thresholdMetric.textContent = result.threshold;
       el.scaleMetric.textContent = `${result.scaleMmPerPixel.toFixed(4)} мм/px`;
       el.downloadBtn.disabled = false;
@@ -592,7 +595,7 @@
       el.widthMm,
       el.bridgeMm,
       el.bridgeSide,
-      el.simplify,
+      el.simplifyMm,
       el.layer
     ].forEach((input) => input.addEventListener("input", debounceConvert));
 

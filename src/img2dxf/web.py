@@ -47,6 +47,7 @@ class ConverterHandler(BaseHTTPRequestHandler):
                 bridge_mm=parse_float(payload.get("bridgeMm"), 0.0),
                 bridge_side=str(payload.get("bridgeSide") or "top"),
                 simplify=parse_float(payload.get("simplify"), 0.75),
+                simplify_mm=parse_optional_nonnegative_float(payload.get("simplifyMm")),
                 min_area_px=parse_int(payload.get("minAreaPx"), 0),
                 layer=str(payload.get("layer") or "CUT")[:64],
                 color=parse_int(payload.get("color"), 1),
@@ -64,6 +65,8 @@ class ConverterHandler(BaseHTTPRequestHandler):
                 "scaleMmPerPixel": result.scale_mm_per_pixel,
                 "bridgeWidthPx": result.bridge_width_px,
                 "bridgesCreated": result.bridges_created,
+                "simplifyTolerancePx": result.simplify_tolerance_px,
+                "simplifyToleranceMm": result.simplify_tolerance_mm,
                 "pathCount": result.path_count,
                 "nodeCount": result.node_count,
                 "previewPng": "data:image/png;base64,"
@@ -127,6 +130,15 @@ def parse_optional_float(value: Any) -> float | None:
     parsed = float(value)
     if parsed <= 0:
         raise ValueError("width must be greater than 0")
+    return parsed
+
+
+def parse_optional_nonnegative_float(value: Any) -> float | None:
+    if value in {None, ""}:
+        return None
+    parsed = float(value)
+    if parsed < 0:
+        raise ValueError("value must be 0 or greater")
     return parsed
 
 

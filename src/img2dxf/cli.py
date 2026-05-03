@@ -21,6 +21,7 @@ def main(argv: list[str] | None = None) -> int:
                 bridge_mm=args.bridge_mm,
                 bridge_side=args.bridge_side,
                 simplify=args.simplify,
+                simplify_mm=args.simplify_mm,
                 min_area_px=args.min_area_px,
                 layer=args.layer,
                 color=args.color,
@@ -40,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"threshold={result.threshold} paths={result.path_count} "
         f"bridges={result.bridges_created} "
+        f"simplify={result.simplify_tolerance_mm:.3f}mm "
         f"scale={result.scale_mm_per_pixel:.6f}mm/px output={args.output}"
     )
     return 0
@@ -80,6 +82,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=0.75,
         help="Polyline simplification tolerance in pixels. Use 0 to preserve steps.",
+    )
+    parser.add_argument(
+        "--simplify-mm",
+        type=float,
+        help="Polyline simplification tolerance in millimeters. Overrides --simplify.",
     )
     parser.add_argument(
         "--bridge-mm",
