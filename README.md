@@ -1,5 +1,9 @@
 # Image to DXF
 
+<p align="center">
+  <img src="src/img2dxf/web_assets/app-icon.svg" width="96" alt="Image to DXF app icon">
+</p>
+
 [![Tests](https://github.com/pomaxa/image2dxf/actions/workflows/tests.yml/badge.svg)](https://github.com/pomaxa/image2dxf/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/github/license/pomaxa/image2dxf)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)

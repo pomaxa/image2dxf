@@ -22,6 +22,10 @@ class ConverterHandler(BaseHTTPRequestHandler):
             html = files("img2dxf").joinpath("web_assets/index.html").read_bytes()
             self._send_bytes(html, "text/html; charset=utf-8")
             return
+        if self.path in {"/app-icon.svg", "/favicon.svg"}:
+            icon = files("img2dxf").joinpath("web_assets/app-icon.svg").read_bytes()
+            self._send_bytes(icon, "image/svg+xml")
+            return
         if self.path == "/health":
             self._send_json({"ok": True})
             return

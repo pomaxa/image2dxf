@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Image to DXF</title>
+  <desc id="desc">Laser beam converting raster pixels into vector cut paths.</desc>
+  <defs>
+    <linearGradient id="bg" x1="72" y1="52" x2="440" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#28313b"/>
+      <stop offset="1" stop-color="#111820"/>
+    </linearGradient>
+    <linearGradient id="sheet" x1="160" y1="96" x2="352" y2="376" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e7eef6"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="404" cy="116" r="40" fill="#33404d"/>
+  <circle cx="104" cy="404" r="30" fill="#25303a"/>
+
+  <g filter="url(#softShadow)">
+    <path d="M150 92h162l72 76v246a28 28 0 0 1-28 28H150a28 28 0 0 1-28-28V120a28 28 0 0 1 28-28Z" fill="url(#sheet)"/>
+    <path d="M312 92v54a22 22 0 0 0 22 22h50Z" fill="#cbd8e5"/>
+  </g>
+
+  <g fill="#202832">
+    <rect x="164" y="158" width="24" height="24" rx="5"/>
+    <rect x="198" y="158" width="24" height="24" rx="5"/>
+    <rect x="232" y="158" width="24" height="24" rx="5"/>
+    <rect x="164" y="192" width="24" height="24" rx="5"/>
+    <rect x="232" y="192" width="24" height="24" rx="5"/>
+    <rect x="266" y="192" width="24" height="24" rx="5"/>
+    <rect x="198" y="226" width="24" height="24" rx="5"/>
+    <rect x="232" y="226" width="24" height="24" rx="5"/>
+    <rect x="300" y="226" width="24" height="24" rx="5"/>
+  </g>
+
+  <path d="M158 346c38-70 92-92 132-68 32 19 16 72 54 70 24-1 37-20 46-44" fill="none" stroke="#c9362c" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M118 316h276" stroke="#ff5146" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="118" cy="316" r="16" fill="#ff5146"/>
+
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" opacity="0.92">
+    <path d="M166 346c34-54 76-66 105-49" stroke-width="8"/>
+    <path d="M326 350c30 2 50-17 64-46" stroke-width="8"/>
+  </g>
+</svg>
