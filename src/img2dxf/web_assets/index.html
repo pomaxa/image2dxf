@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image to DXF</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f8;
+      --panel: #ffffff;
+      --text: #1e2329;
+      --muted: #69717d;
+      --line: #d8dde3;
+      --accent: #c9362c;
+      --accent-dark: #9f2a22;
+      --blue: #2868a9;
+      --shadow: 0 1px 2px rgba(20, 30, 40, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 58px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 650;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 14px;
+      padding: 14px;
+      min-height: calc(100vh - 58px);
+    }
+
+    aside,
+    .workspace {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    aside {
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric {
+      min-width: 84px;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 12px;
+      overflow: auto;
+    }
+
+    figure {
+      margin: 0;
+      min-width: 0;
+    }
+
+    figcaption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .preview-box {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      min-height: 360px;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .preview-box img,
+    .preview-box svg {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .dropzone {
+      display: grid;
+      gap: 8px;
+      padding: 18px;
+      border: 1px dashed #aab3bd;
+      border-radius: 8px;
+      background: #fafbfc;
+      cursor: pointer;
+    }
+
+    .dropzone strong {
+      font-size: 14px;
+    }
+
+    .dropzone span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dropzone.drag {
+      border-color: var(--blue);
+      background: #eef5fc;
+    }
+
+    .group {
+      display: grid;
+      gap: 10px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .group:last-child {
+      border-bottom: 0;
+    }
+
+    .group-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 580;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: var(--text);
+      font: inherit;
+      background: #fff;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .row label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 580;
+    }
+
+    .value {
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    button,
+    .file-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font: inherit;
+      font-weight: 650;
+      text-decoration: none;
+      cursor: pointer;
+      color: #fff;
+      background: var(--accent);
+    }
+
+    button.secondary {
+      color: var(--text);
+      border-color: var(--line);
+      background: #fff;
+    }
+
+    button:hover,
+    .file-button:hover {
+      background: var(--accent-dark);
+    }
+
+    button.secondary:hover {
+      background: #f0f2f4;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+    }
+
+    #fileInput {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @media (max-width: 1020px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-box {
+        min-height: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Image to DXF</h1>
+    <div class="status" id="status">Готово</div>
+  </header>
+
+  <main>
+    <aside>
+      <label class="dropzone" id="dropzone">
+        <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/bmp">
+        <strong>Выбрать изображение</strong>
+        <span>PNG, JPG, WEBP или BMP</span>
+      </label>
+
+      <section class="group">
+        <div class="group-title">Монохром</div>
+        <div class="row">
+          <label><input id="autoThreshold" type="checkbox" checked> Авто порог</label>
+          <span class="value" id="thresholdReadout">auto</span>
+        </div>
+        <label>
+          Порог
+          <input id="threshold" type="range" min="0" max="255" value="128" disabled>
+        </label>
+        <div class="row">
+          <label><input id="invert" type="checkbox"> Инвертировать</label>
+        </div>
+        <label>
+          Убрать пятна меньше, px
+          <input id="minAreaPx" type="number" min="0" step="1" value="20">
+        </label>
+      </section>
+
+      <section class="group">
+        <div class="group-title">DXF</div>
+        <label>
+          Ширина детали, мм
+          <input id="widthMm" type="number" min="1" step="0.1" value="100">
+        </label>
+        <label>
+          Перемычки, мм
+          <input id="bridgeMm" type="number" min="0" step="0.1" value="2">
+        </label>
+        <label>
+          Сторона перемычки
+          <select id="bridgeSide">
+            <option value="top" selected>Верх</option>
+            <option value="bottom">Низ</option>
+            <option value="left">Лево</option>
+            <option value="right">Право</option>
+            <option value="nearest">Ближайшая</option>
+          </select>
+        </label>
+        <label>
+          Упрощение контура, px
+          <input id="simplify" type="range" min="0" max="3" step="0.1" value="0.8">
+        </label>
+        <div class="row">
+          <span class="value" id="simplifyReadout">0.8 px</span>
+        </div>
+        <label>
+          Слой
+          <input id="layer" type="text" value="CUT" maxlength="64">
+        </label>
+      </section>
+
+      <section class="group">
+        <div class="actions">
+          <button id="convertBtn" type="button">Обновить</button>
+          <button id="downloadBtn" type="button" disabled>DXF</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div class="toolbar">
+        <div class="metrics">
+          <div class="metric">Контуры: <b id="pathsMetric">0</b></div>
+          <div class="metric">Точки: <b id="nodesMetric">0</b></div>
+          <div class="metric">Перемычки: <b id="bridgesMetric">0</b></div>
+          <div class="metric">Порог: <b id="thresholdMetric">-</b></div>
+          <div class="metric">Масштаб: <b id="scaleMetric">-</b></div>
+        </div>
+      </div>
+
+      <div class="preview-grid">
+        <figure>
+          <figcaption>Оригинал</figcaption>
+          <div class="preview-box"><div class="empty" id="originalEmpty">Нет файла</div><img id="originalPreview" alt=""></div>
+        </figure>
+        <figure>
+          <figcaption>Монохром</figcaption>
+          <div class="preview-box"><div class="empty" id="monoEmpty">Нет результата</div><img id="monoPreview" alt=""></div>
+        </figure>
+        <figure>
+          <figcaption>Контуры DXF</figcaption>
+          <div class="preview-box" id="vectorPreview"><div class="empty">Нет результата</div></div>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      file: null,
+      imageDataUrl: "",
+      result: null,
+      timer: 0
+    };
+
+    const el = {
+      status: document.getElementById("status"),
+      dropzone: document.getElementById("dropzone"),
+      fileInput: document.getElementById("fileInput"),
+      autoThreshold: document.getElementById("autoThreshold"),
+      threshold: document.getElementById("threshold"),
+      thresholdReadout: document.getElementById("thresholdReadout"),
+      invert: document.getElementById("invert"),
+      minAreaPx: document.getElementById("minAreaPx"),
+      widthMm: document.getElementById("widthMm"),
+      bridgeMm: document.getElementById("bridgeMm"),
+      bridgeSide: document.getElementById("bridgeSide"),
+      simplify: document.getElementById("simplify"),
+      simplifyReadout: document.getElementById("simplifyReadout"),
+      layer: document.getElementById("layer"),
+      convertBtn: document.getElementById("convertBtn"),
+      downloadBtn: document.getElementById("downloadBtn"),
+      originalPreview: document.getElementById("originalPreview"),
+      monoPreview: document.getElementById("monoPreview"),
+      vectorPreview: document.getElementById("vectorPreview"),
+      originalEmpty: document.getElementById("originalEmpty"),
+      monoEmpty: document.getElementById("monoEmpty"),
+      pathsMetric: document.getElementById("pathsMetric"),
+      nodesMetric: document.getElementById("nodesMetric"),
+      bridgesMetric: document.getElementById("bridgesMetric"),
+      thresholdMetric: document.getElementById("thresholdMetric"),
+      scaleMetric: document.getElementById("scaleMetric")
+    };
+
+    function setStatus(text) {
+      el.status.textContent = text;
+    }
+
+    function updateControlReadouts() {
+      el.threshold.disabled = el.autoThreshold.checked;
+      el.thresholdReadout.textContent = el.autoThreshold.checked ? "auto" : el.threshold.value;
+      el.simplifyReadout.textContent = `${Number(el.simplify.value).toFixed(1)} px`;
+    }
+
+    function debounceConvert() {
+      clearTimeout(state.timer);
+      state.timer = setTimeout(convert, 180);
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      state.file = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.imageDataUrl = String(reader.result);
+        el.originalPreview.src = state.imageDataUrl;
+        el.originalPreview.style.display = "block";
+        el.originalEmpty.style.display = "none";
+        setStatus(file.name);
+        convert();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function convert() {
+      updateControlReadouts();
+      if (!state.imageDataUrl) {
+        setStatus("Выберите изображение");
+        return;
+      }
+
+      el.convertBtn.disabled = true;
+      setStatus("Обработка...");
+      try {
+        const response = await fetch("/api/convert", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            image: state.imageDataUrl,
+            autoThreshold: el.autoThreshold.checked,
+            threshold: Number(el.threshold.value),
+            invert: el.invert.checked,
+            minAreaPx: Number(el.minAreaPx.value || 0),
+            widthMm: el.widthMm.value,
+            bridgeMm: el.bridgeMm.value,
+            bridgeSide: el.bridgeSide.value,
+            simplify: Number(el.simplify.value),
+            layer: el.layer.value || "CUT"
+          })
+        });
+
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.error || "Ошибка конвертации");
+        }
+
+        state.result = payload;
+        renderResult(payload);
+        setStatus("Готово");
+      } catch (error) {
+        setStatus(error.message);
+      } finally {
+        el.convertBtn.disabled = false;
+      }
+    }
+
+    function renderResult(result) {
+      el.monoPreview.src = result.previewPng;
+      el.monoPreview.style.display = "block";
+      el.monoEmpty.style.display = "none";
+      el.vectorPreview.innerHTML = result.svg;
+
+      el.pathsMetric.textContent = result.pathCount;
+      el.nodesMetric.textContent = result.nodeCount;
+      el.bridgesMetric.textContent = `${result.bridgesCreated} / ${result.bridgeWidthPx}px`;
+      el.thresholdMetric.textContent = result.threshold;
+      el.scaleMetric.textContent = `${result.scaleMmPerPixel.toFixed(4)} мм/px`;
+      el.downloadBtn.disabled = false;
+    }
+
+    function downloadDxf() {
+      if (!state.result) return;
+      const stem = (state.file?.name || "image").replace(/\.[^.]+$/, "") || "image";
+      const blob = new Blob([state.result.dxf], {type: "application/dxf"});
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${stem}.dxf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    el.fileInput.addEventListener("change", () => handleFile(el.fileInput.files[0]));
+    el.convertBtn.addEventListener("click", convert);
+    el.downloadBtn.addEventListener("click", downloadDxf);
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      el.dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        el.dropzone.classList.add("drag");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      el.dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        el.dropzone.classList.remove("drag");
+      });
+    });
+
+    el.dropzone.addEventListener("drop", (event) => {
+      handleFile(event.dataTransfer.files[0]);
+    });
+
+    [
+      el.autoThreshold,
+      el.threshold,
+      el.invert,
+      el.minAreaPx,
+      el.widthMm,
+      el.bridgeMm,
+      el.bridgeSide,
+      el.simplify,
+      el.layer
+    ].forEach((input) => input.addEventListener("input", debounceConvert));
+
+    updateControlReadouts();
+  </script>
+</body>
+</html>
