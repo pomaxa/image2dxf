@@ -1,5 +1,15 @@
 # Image to DXF
 
+[![Tests](https://github.com/pomaxa/image2dxf/actions/workflows/tests.yml/badge.svg)](https://github.com/pomaxa/image2dxf/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/github/license/pomaxa/image2dxf)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![Version](https://img.shields.io/badge/version-0.1.0-2f6f4e)](pyproject.toml)
+[![Pillow 10+](https://img.shields.io/badge/Pillow-10%2B-6b46c1)](requirements.txt)
+[![Last commit](https://img.shields.io/github/last-commit/pomaxa/image2dxf)](https://github.com/pomaxa/image2dxf/commits/main)
+[![Repo size](https://img.shields.io/github/repo-size/pomaxa/image2dxf)](https://github.com/pomaxa/image2dxf)
+[![Issues](https://img.shields.io/github/issues/pomaxa/image2dxf)](https://github.com/pomaxa/image2dxf/issues)
+[![Stars](https://img.shields.io/github/stars/pomaxa/image2dxf?style=social)](https://github.com/pomaxa/image2dxf/stargazers)
+
 Small CLI tool for preparing raster artwork for laser cutting. It converts an image to monochrome, traces the black regions, and writes closed DXF polylines in millimeters.
 
 ## Setup
