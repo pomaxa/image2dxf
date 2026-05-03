@@ -14,62 +14,101 @@
 [![Issues](https://img.shields.io/github/issues/pomaxa/image2dxf)](https://github.com/pomaxa/image2dxf/issues)
 [![Stars](https://img.shields.io/github/stars/pomaxa/image2dxf?style=social)](https://github.com/pomaxa/image2dxf/stargazers)
 
-Small CLI tool for preparing raster artwork for laser cutting. It converts an image to monochrome, traces the black regions, and writes closed DXF polylines in millimeters.
+Image to DXF prepares raster artwork for laser cutting. It converts PNG/JPG-style images to a monochrome mask, traces cut contours, optionally adds stencil bridges for inner letter islands, and writes closed DXF polylines in millimeters.
 
-## Setup
+## Features
+
+- Local web UI with original, monochrome, and vector previews.
+- CLI for repeatable conversions and batch-friendly workflows.
+- Otsu auto-threshold or fixed black/white threshold.
+- DXF output using closed `LWPOLYLINE` entities on a configurable layer.
+- Stencil bridges for counters in letters like `O`, `e`, `P`, and `a`.
+- Polygon simplification in millimeters for cleaner laser paths.
+- No cloud processing; images are handled locally.
+
+## Quick Start
 
 ```sh
+git clone git@github.com:pomaxa/image2dxf.git
+cd image2dxf
 python3 -m pip install -e .
+img2dxf-web
 ```
 
-If editable install is not needed, run directly from the repository:
+Open the local UI:
 
-```sh
-PYTHONPATH=src python3 -m img2dxf input.png output.dxf --width-mm 100
+```text
+http://127.0.0.1:8000
 ```
 
-## Usage
-
-```sh
-img2dxf input.png output.dxf --width-mm 100 --mono-output preview.png
-```
-
-For stencil-style artwork where inner letter parts must stay attached, add bridges:
-
-```sh
-img2dxf input.png output.dxf --width-mm 100 --bridge-mm 2
-```
-
-For smoother DXF output, simplify polygons in millimeters:
-
-```sh
-img2dxf input.png output.dxf --width-mm 100 --simplify-mm 0.2
-```
-
-Run the local preview UI:
+For direct repository execution without installing scripts:
 
 ```sh
 PYTHONPATH=src python3 -m img2dxf.web --host 127.0.0.1 --port 8000
 ```
 
-Useful options:
+## CLI Usage
+
+Basic conversion:
 
 ```sh
---threshold 128          Use a fixed black/white threshold instead of Otsu auto threshold
---invert                 Cut light regions instead of dark regions
---scale-mm-per-pixel 0.1 Use an explicit scale instead of target width
---bridge-mm 2            Add bridges to inner black islands, such as O/e counters
---bridge-side top        Put bridges on top, bottom, left, right, or nearest side
---simplify 0.8           Reduce DXF nodes; value is in source pixels
---simplify-mm 0.2        Reduce DXF nodes; value is in millimeters
---min-area-px 20         Remove tiny black components before tracing
---layer CUT              Set the DXF layer name
+img2dxf input.png output.dxf --width-mm 100 --mono-output preview.png
 ```
 
-Black pixels become cut paths. Use `--mono-output` to inspect the exact raster mask before sending the DXF to laser software.
+Keep inner letter parts attached for stencil-style cutting:
 
-## Tests
+```sh
+img2dxf input.png output.dxf --width-mm 100 --bridge-mm 2 --bridge-side top
+```
+
+Reduce excess polygon nodes in physical units:
+
+```sh
+img2dxf input.png output.dxf --width-mm 100 --simplify-mm 0.2
+```
+
+## Key Options
+
+```text
+--width-mm 100           Scale output to a target width in millimeters
+--scale-mm-per-pixel 0.1 Use an explicit raster-to-DXF scale
+--threshold 128          Use a fixed threshold instead of auto-threshold
+--invert                 Trace light regions instead of dark regions
+--bridge-mm 2            Add bridges to inner black islands
+--bridge-side top        top, bottom, left, right, or nearest
+--simplify-mm 0.2        Simplify contours in millimeters
+--simplify 0.8           Simplify contours in source pixels
+--min-area-px 20         Remove tiny black components before tracing
+--layer CUT              DXF layer name
+```
+
+Black pixels become cut paths. Always inspect `--mono-output` or the web preview before sending the DXF to laser software.
+
+## Recommended Laser Workflow
+
+1. Start with a high-contrast image on a clean background.
+2. Adjust threshold until the monochrome preview matches the desired cut shape.
+3. Set the final physical width with `--width-mm`.
+4. Add bridges, usually `--bridge-mm 2`, when letter interiors must not fall out.
+5. Increase `--simplify-mm` gradually until the path is clean without losing important detail.
+6. Import the DXF into laser software and confirm size, layer, and closed contours.
+
+## Development
+
+Run tests:
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
+
+Project layout:
+
+```text
+src/img2dxf/              Converter, DXF writer, web server, and tracing code
+src/img2dxf/web_assets/   Web UI assets
+tests/                    Unit tests
+```
+
+## License
+
+MIT. See [LICENSE](LICENSE).
